@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Uma cartinha pra você 💌</title>
+
+  <style>
+    :root{
+      --bg1:#fff0f5;
+      --bg2:#ffe6ee;
+      --card:#ffffffcc;
+      --txt:#2b2b2b;
+      --shadow: 0 16px 60px rgba(0,0,0,.18);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--txt);
+      background: radial-gradient(1200px 800px at 50% 20%, var(--bg2), var(--bg1));
+      overflow:hidden;
+    }
+
+    /* Fundo com brilhinhos */
+    .sparkle{
+      position:absolute; inset:0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,.7) 0 2px, transparent 3px),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,.6) 0 2px, transparent 3px),
+        radial-gradient(circle at 30% 70%, rgba(255,255,255,.55) 0 2px, transparent 3px),
+        radial-gradient(circle at 60% 85%, rgba(255,255,255,.6) 0 2px, transparent 3px);
+      opacity:.5;
+      filter: blur(.2px);
+      pointer-events:none;
+      animation: floaty 10s ease-in-out infinite alternate;
+    }
+    @keyframes floaty{
+      from{ transform: translateY(0); }
+      to{ transform: translateY(-18px); }
+    }
+
+    .wrap{
+      position:relative;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    /* Cena do envelope */
+    .scene{
+      width:min(520px, 92vw);
+      text-align:center;
+      user-select:none;
+    }
+
+    .title{
+      font-weight:700;
+      font-size: clamp(18px, 3.8vw, 26px);
+      margin:0 0 14px;
+      letter-spacing:.2px;
+    }
+
+    .hint{
+      margin:10px 0 0;
+      font-size:14px;
+      opacity:.75;
+    }
+
+    /* Envelope em CSS */
+    .envelope{
+      width:min(420px, 90vw);
+      height:min(280px, 60vw);
+      margin: 10px auto 0;
+      position:relative;
+      cursor:pointer;
+      transform: translateZ(0);
+      filter: drop-shadow(0 22px 22px rgba(0,0,0,.18));
+      transition: transform .15s ease;
+    }
+    .envelope:active{ transform: scale(.98); }
+
+    .env-back{
+      position:absolute; inset:0;
+      background:#fff;
+      border-radius:18px;
+      overflow:hidden;
+      border: 2px solid rgba(0,0,0,.06);
+    }
+
+    .env-front{
+      position:absolute; inset:0;
+      border-radius:18px;
+      overflow:hidden;
+    }
+
+    /* Base do envelope */
+    .env-base{
+      position:absolute; inset:0;
+      background: linear-gradient(180deg, #ffffff, #fff7fa);
+    }
+
+    /* Linhas triangulares */
+    .tri-left{
+      position:absolute; left:0; top:0; width:50%; height:100%;
+      background: linear-gradient(135deg, #fff, #ffe9f1);
+      clip-path: polygon(0 0, 100% 50%, 0 100%);
+      border-right: 2px solid rgba(0,0,0,.06);
+    }
+    .tri-right{
+      position:absolute; right:0; top:0; width:50%; height:100%;
+      background: linear-gradient(225deg, #fff, #ffe9f1);
+      clip-path: polygon(100% 0, 100% 100%, 0 50%);
+      border-left: 2px solid rgba(0,0,0,.06);
+    }
+    .tri-bottom{
+      position:absolute; left:0; bottom:0; width:100%; height:55%;
+      background: linear-gradient(180deg, #fff, #ffe9f1);
+      clip-path: polygon(0 100%, 50% 35%, 100% 100%);
+      border-top: 2px solid rgba(0,0,0,.06);
+    }
+
+    /* Tampa do envelope (abre) */
+    .flap{
+      position:absolute; left:0; top:0; width:100%; height:58%;
+      background: linear-gradient(180deg, #ffe1ec, #fff);
+      clip-path: polygon(0 0, 50% 100%, 100% 0);
+      transform-origin: top center;
+      transition: transform .75s cubic-bezier(.2,.9,.2,1);
+      border-bottom: 2px solid rgba(0,0,0,.06);
+    }
+
+    .open .flap{
+      transform: rotateX(180deg);
+    }
+
+    /* Seta */
+    .arrow{
+      margin: 12px auto 0;
+      font-size: 38px;
+      animation: bounce 1s ease-in-out infinite;
+      opacity:.9;
+    }
+    @keyframes bounce{
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(10px); }
+    }
+
+    /* Conteúdo (card) após abrir */
+    .content{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      overflow:auto;
+    }
+    .content.show{ display:flex; }
+
+    .card{
+      width:min(640px, 94vw);
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.6);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    /* Galeria */
+    .gallery{
+      display:flex;
+      gap:0;
+      overflow:hidden;
+      position:relative;
+      height: 320px;
+      background:#fff;
+    }
+    .gallery img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      flex: 0 0 100%;
+      transform: translateX(calc(-100% * var(--slide, 0)));
+      transition: transform .55s ease;
+    }
+
+    .dots{
+      position:absolute;
+      bottom:10px; left:0; right:0;
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      pointer-events:none;
+    }
+    .dot{
+      width:8px; height:8px;
+      border-radius:99px;
+      background: rgba(255,255,255,.65);
+      outline: 1px solid rgba(0,0,0,.08);
+    }
+    .dot.on{ background: rgba(255,255,255,.95); }
+
+    .letter{
+      padding: 18px 18px 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.0), rgba(255,255,255,.55));
+    }
+
+    .letter h2{
+      margin: 0 0 8px;
+      font-size: 22px;
+      letter-spacing:.2px;
+    }
+
+    .letter p{
+      margin: 0;
+      line-height: 1.55;
+      font-size: 16px;
+      white-space: pre-line; /* respeita quebras de linha */
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      padding: 0 18px 18px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      border:0;
+      padding:12px 14px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:650;
+      box-shadow: 0 10px 20px rgba(0,0,0,.12);
+    }
+    .btn.primary{
+      background: #ff4d86;
+      color:white;
+    }
+    .btn.ghost{
+      background: rgba(255,255,255,.75);
+      color:#333;
+    }
+
+    /* Corações */
+    .heart{
+      position:absolute;
+      font-size: 22px;
+      pointer-events:none;
+      animation: floatUp linear forwards;
+      filter: drop-shadow(0 10px 12px rgba(0,0,0,.18));
+    }
+    @keyframes floatUp{
+      from{ transform: translateY(0) scale(1); opacity:1; }
+      to{ transform: translateY(-110vh) scale(.9); opacity:0; }
+    }
+
+    /* Para telas pequenas */
+    @media (max-width: 420px){
+      .gallery{ height: 270px; }
+      .letter h2{ font-size: 20px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sparkle"></div>
+
+  <div class="wrap">
+    <div class="scene" id="scene">
+      <p class="title">Toque no envelope 💌</p>
+
+      <div class="arrow">⬇️</div>
+
+      <div class="envelope" id="envelope" aria-label="Abrir envelope">
+        <div class="env-back">
+          <div class="env-base"></div>
+          <div class="tri-left"></div>
+          <div class="tri-right"></div>
+          <div class="tri-bottom"></div>
+        </div>
+
+        <div class="env-front">
+          <div class="flap" id="flap"></div>
+        </div>
+      </div>
+
+      <p class="hint">Clique/Toque para abrir</p>
+    </div>
+  </div>
+
+  <!-- Conteúdo que aparece depois -->
+  <div class="content" id="content">
+    <div class="card">
+      <div class="gallery" id="gallery">
+        <!-- troque os nomes se quiser -->
+<img src="foto1.jpeg" alt="Foto 1" />
+<img src="foto2.jpeg" alt="Foto 2" />
+<img src="foto3.jpeg" alt="Foto 3" />
+
+        <div class="dots" id="dots"></div>
+      </div>
+
+      <div class="letter">
+        <h2>Minha cartinha 💖</h2>
+
+        <!-- ✍️ EDITE A CARTA AQUI -->
+        <p id="text">
+Morgs,
+
+Quero que você saiba o quanto você é especial pra mim.
+Ter você na minha vida é um presente que agradeço todos os dias.
+
+Obrigada por cada risada, cada conversa, cada momento bobo e cada apoio silencioso.
+Você me entende como poucas pessoas conseguem.
+
+Que a nossa amizade continue crescendo, se fortalecendo e sendo esse lugar seguro onde a gente pode ser exatamente quem é.
+
+Te levo no coração, hoje e sempre.
+Te amo, minha melhor. ❤️
+        </p>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="again">Abrir de novo 💌</button>
+        <button class="btn ghost" id="share">Compartilhar link 🔗</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const envelope = document.getElementById('envelope');
+    const scene = document.getElementById('scene');
+    const content = document.getElementById('content');
+
+    // Slider simples
+    const gallery = document.getElementById('gallery');
+    const imgs = [...gallery.querySelectorAll('img')];
+    const dots = document.getElementById('dots');
+    let slide = 0;
+
+    function buildDots(){
+      dots.innerHTML = '';
+      imgs.forEach((_, i) => {
+        const d = document.createElement('div');
+        d.className = 'dot' + (i===slide ? ' on' : '');
+        dots.appendChild(d);
+      });
+    }
+
+    function setSlide(i){
+      slide = (i + imgs.length) % imgs.length;
+      gallery.style.setProperty('--slide', slide);
+      [...dots.children].forEach((d, idx) => d.classList.toggle('on', idx===slide));
+    }
+
+    let sliderTimer = null;
+    function startSlider(){
+      buildDots();
+      setSlide(0);
+      sliderTimer = setInterval(() => setSlide(slide + 1), 2500);
+    }
+    function stopSlider(){
+      if (sliderTimer) clearInterval(sliderTimer);
+      sliderTimer = null;
+    }
+
+    // Corações
+    function spawnHearts(qtd=28){
+      for (let i=0;i<qtd;i++){
+        const h = document.createElement('div');
+        h.className = 'heart';
+        h.textContent = (Math.random() < 0.85) ? '❤️' : '💖';
+        h.style.left = (Math.random()*100) + 'vw';
+        h.style.bottom = (-10 - Math.random()*20) + 'px';
+        h.style.fontSize = (18 + Math.random()*26) + 'px';
+        const dur = 2.2 + Math.random()*2.2; // 2.2 a 4.4s
+        h.style.animationDuration = dur + 's';
+        h.style.opacity = (0.75 + Math.random()*0.25);
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), (dur*1000)+200);
+      }
+    }
+
+    function openEnvelope(){
+      scene.classList.add('open');
+      envelope.classList.add('open');
+      spawnHearts(36);
+
+      setTimeout(() => {
+        content.classList.add('show');
+        startSlider();
+      }, 650);
+    }
+
+    function resetAll(){
+      stopSlider();
+      content.classList.remove('show');
+      envelope.classList.remove('open');
+      scene.classList.remove('open');
+      // volta setinha/scene visível
+      window.scrollTo(0,0);
+    }
+
+    envelope.addEventListener('click', openEnvelope);
+
+    document.getElementById('again').addEventListener('click', () => {
+      resetAll();
+      setTimeout(openEnvelope, 250);
+    });
+
+    // Compartilhar (no celular funciona bem)
+    document.getElementById('share').addEventListener('click', async () => {
+      const url = window.location.href;
+      try{
+        if (navigator.share){
+          await navigator.share({ title: 'Cartinha 💌', text: 'Abre aqui ❤️', url });
+        } else {
+          await navigator.clipboard.writeText(url);
+          alert('Link copiado! ✅');
+        }
+      } catch(e){
+        // fallback
+        try{
+          await navigator.clipboard.writeText(url);
+          alert('Link copiado! ✅');
+        }catch(_){
+          alert('Não consegui compartilhar automaticamente. Copie o link da barra do navegador 🙂');
+        }
+      }
