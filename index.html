@@ -24,7 +24,6 @@
       overflow:hidden;
     }
 
-    /* Fundo com brilhinhos */
     .sparkle{
       position:absolute; inset:0;
       background-image:
@@ -51,7 +50,6 @@
       padding:20px;
     }
 
-    /* Cena do envelope */
     .scene{
       width:min(520px, 92vw);
       text-align:center;
@@ -71,7 +69,6 @@
       opacity:.75;
     }
 
-    /* Envelope em CSS */
     .envelope{
       width:min(420px, 90vw);
       height:min(280px, 60vw);
@@ -98,13 +95,11 @@
       overflow:hidden;
     }
 
-    /* Base do envelope */
     .env-base{
       position:absolute; inset:0;
       background: linear-gradient(180deg, #ffffff, #fff7fa);
     }
 
-    /* Linhas triangulares */
     .tri-left{
       position:absolute; left:0; top:0; width:50%; height:100%;
       background: linear-gradient(135deg, #fff, #ffe9f1);
@@ -124,7 +119,6 @@
       border-top: 2px solid rgba(0,0,0,.06);
     }
 
-    /* Tampa do envelope (abre) */
     .flap{
       position:absolute; left:0; top:0; width:100%; height:58%;
       background: linear-gradient(180deg, #ffe1ec, #fff);
@@ -138,7 +132,6 @@
       transform: rotateX(180deg);
     }
 
-    /* Seta */
     .arrow{
       margin: 12px auto 0;
       font-size: 38px;
@@ -150,7 +143,6 @@
       50%{ transform: translateY(10px); }
     }
 
-    /* Conteúdo (card) após abrir */
     .content{
       position:fixed;
       inset:0;
@@ -172,7 +164,6 @@
       overflow:hidden;
     }
 
-    /* Galeria */
     .gallery{
       display:flex;
       gap:0;
@@ -221,7 +212,7 @@
       margin: 0;
       line-height: 1.55;
       font-size: 16px;
-      white-space: pre-line; /* respeita quebras de linha */
+      white-space: pre-line;
     }
 
     .actions{
@@ -247,7 +238,6 @@
       color:#333;
     }
 
-    /* Corações */
     .heart{
       position:absolute;
       font-size: 22px;
@@ -260,7 +250,6 @@
       to{ transform: translateY(-110vh) scale(.9); opacity:0; }
     }
 
-    /* Para telas pequenas */
     @media (max-width: 420px){
       .gallery{ height: 270px; }
       .letter h2{ font-size: 20px; }
@@ -277,8 +266,7 @@
 
       <div class="arrow">⬇️</div>
 
-     <div class="envelope" id="envelope" aria-label="Abrir envelope" onclick="openEnvelope()">
-
+      <div class="envelope" id="envelope" aria-label="Abrir envelope">
         <div class="env-back">
           <div class="env-base"></div>
           <div class="tri-left"></div>
@@ -295,24 +283,18 @@
     </div>
   </div>
 
-  <!-- Conteúdo que aparece depois -->
   <div class="content" id="content">
     <div class="card">
       <div class="gallery" id="gallery">
-        <!-- troque os nomes se quiser -->
-<img src="foto1.jpeg" alt="Foto 1" />
-<img src="foto2.jpeg" alt="Foto 2" />
-<img src="foto3.jpeg" alt="Foto 3" />
-
+        <img src="foto1.jpeg" alt="Foto 1" />
+        <img src="foto2.jpeg" alt="Foto 2" />
+        <img src="foto3.jpeg" alt="Foto 3" />
         <div class="dots" id="dots"></div>
       </div>
 
       <div class="letter">
         <h2>Minha cartinha 💖</h2>
-
-        <!-- ✍️ EDITE A CARTA AQUI -->
-        <p id="text">
-Morgs,
+        <p id="text">Morgs,
 
 Quero que você saiba o quanto você é especial pra mim.
 Ter você na minha vida é um presente que agradeço todos os dias.
@@ -323,8 +305,7 @@ Você me entende como poucas pessoas conseguem.
 Que a nossa amizade continue crescendo, se fortalecendo e sendo esse lugar seguro onde a gente pode ser exatamente quem é.
 
 Te levo no coração, hoje e sempre.
-Te amo, minha melhor. ❤️
-        </p>
+Te amo, minha melhor. ❤️</p>
       </div>
 
       <div class="actions">
@@ -339,7 +320,6 @@ Te amo, minha melhor. ❤️
     const scene = document.getElementById('scene');
     const content = document.getElementById('content');
 
-    // Slider simples
     const gallery = document.getElementById('gallery');
     const imgs = [...gallery.querySelectorAll('img')];
     const dots = document.getElementById('dots');
@@ -371,7 +351,6 @@ Te amo, minha melhor. ❤️
       sliderTimer = null;
     }
 
-    // Corações
     function spawnHearts(qtd=28){
       for (let i=0;i<qtd;i++){
         const h = document.createElement('div');
@@ -380,7 +359,7 @@ Te amo, minha melhor. ❤️
         h.style.left = (Math.random()*100) + 'vw';
         h.style.bottom = (-10 - Math.random()*20) + 'px';
         h.style.fontSize = (18 + Math.random()*26) + 'px';
-        const dur = 2.2 + Math.random()*2.2; // 2.2 a 4.4s
+        const dur = 2.2 + Math.random()*2.2;
         h.style.animationDuration = dur + 's';
         h.style.opacity = (0.75 + Math.random()*0.25);
         document.body.appendChild(h);
@@ -404,19 +383,16 @@ Te amo, minha melhor. ❤️
       content.classList.remove('show');
       envelope.classList.remove('open');
       scene.classList.remove('open');
-      // volta setinha/scene visível
       window.scrollTo(0,0);
     }
 
-    document.getElementById('envelope')?.addEventListener('click', openEnvelope);
-
+    envelope.addEventListener('click', openEnvelope);
 
     document.getElementById('again').addEventListener('click', () => {
       resetAll();
       setTimeout(openEnvelope, 250);
     });
 
-    // Compartilhar (no celular funciona bem)
     document.getElementById('share').addEventListener('click', async () => {
       const url = window.location.href;
       try{
@@ -427,7 +403,6 @@ Te amo, minha melhor. ❤️
           alert('Link copiado! ✅');
         }
       } catch(e){
-        // fallback
         try{
           await navigator.clipboard.writeText(url);
           alert('Link copiado! ✅');
@@ -435,3 +410,8 @@ Te amo, minha melhor. ❤️
           alert('Não consegui compartilhar automaticamente. Copie o link da barra do navegador 🙂');
         }
       }
+    });
+  </script>
+</body>
+</html>
+
